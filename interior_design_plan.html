@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>North Facing Home — Interior Design Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFE7D8;
+    --panel:#FBF8F1;
+    --ink:#22282A;
+    --ink-soft:#5B5F5E;
+    --header:#17332F;
+    --header-ink:#F3ECDC;
+    --brass:#B8863B;
+    --line:#D9CFB8;
+    --wall:#22302E;
+    --accent:#B8863B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    background:var(--header);
+    color:var(--header-ink);
+    padding:28px 32px 22px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+    border-bottom:3px solid var(--brass);
+  }
+  header .title-block h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(22px,3vw,32px);
+    margin:0 0 4px;
+    letter-spacing:0.2px;
+  }
+  header .title-block p{
+    margin:0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:#C9BFA0;
+  }
+  header .stats{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:#DCD2B4;
+    text-align:right;
+    line-height:1.7;
+  }
+  header .stats b{color:var(--header-ink);}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);
+    gap:0;
+    max-width:1360px;
+    margin:0 auto;
+  }
+  .stage{
+    padding:26px 20px 40px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+    width:100%;
+    max-width:640px;
+    justify-content:space-between;
+  }
+  .seg{
+    display:flex;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .seg button{
+    border:none;
+    background:transparent;
+    padding:9px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    cursor:pointer;
+    color:var(--ink-soft);
+    transition:background .15s, color .15s;
+  }
+  .seg button.active{
+    background:var(--header);
+    color:var(--header-ink);
+  }
+  .plan-frame{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 12px 30px -18px rgba(23,51,47,0.35);
+    width:100%;
+    max-width:640px;
+  }
+  svg{width:100%;height:auto;display:block;font-family:'IBM Plex Mono',monospace;}
+
+  .room{cursor:pointer; transition:filter .15s;}
+  .room:hover{filter:brightness(1.06);}
+  .room.selected rect.roomfill{stroke:var(--brass); stroke-width:0.26;}
+  .roomfill{stroke:var(--wall); stroke-width:0.13;}
+  .wall{fill:none; stroke:var(--wall); stroke-width:0.32; stroke-linejoin:round;}
+  .room-label{font-family:'Fraunces',serif; font-weight:600; fill:var(--ink); text-anchor:middle;}
+  .room-dim{font-family:'IBM Plex Mono',monospace; fill:var(--ink-soft); text-anchor:middle;}
+  .dim-line{stroke:var(--ink-soft); stroke-width:0.045;}
+  .dim-text{font-family:'IBM Plex Mono',monospace; fill:var(--ink-soft); text-anchor:middle;}
+  .window{stroke:#3A8E94; stroke-width:0.34;}
+  .doorleaf{fill:none; stroke:var(--wall); stroke-width:0.09;}
+  .doorswing{fill:none; stroke:var(--wall); stroke-width:0.05; stroke-dasharray:0.12 0.12;}
+  .furniture{fill:#EDE3CE; stroke:var(--wall); stroke-width:0.06;}
+  .furniture-line{fill:none; stroke:var(--wall); stroke-width:0.05;}
+  .blueprint .furniture, .blueprint .furniture-line, .blueprint .textile{display:none;}
+  .textile{opacity:0.85;}
+  .compass text{font-family:'IBM Plex Mono',monospace; font-size:0.62px; fill:#8A5E2A;}
+  .plot-label{font-family:'IBM Plex Mono',monospace; fill:var(--ink-soft); font-size:0.62px;}
+
+  .side{
+    background:var(--panel);
+    border-left:1px solid var(--line);
+    padding:26px 24px 40px;
+    min-height:100%;
+  }
+  .side h2{
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    margin:0 0 4px;
+  }
+  .side .sub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin:0 0 18px;
+  }
+  .style-picker{
+    display:flex;
+    gap:8px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .style-picker button{
+    flex:1 1 auto;
+    border:1px solid var(--line);
+    background:#fff;
+    border-radius:8px;
+    padding:9px 8px;
+    font-size:12px;
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .style-picker button.active{
+    border-color:var(--brass);
+    color:var(--ink);
+    background:#FBF3E2;
+  }
+  .info-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    background:#fff;
+    margin-bottom:22px;
+  }
+  .info-card h3{
+    margin:0 0 2px;
+    font-family:'Fraunces',serif;
+    font-size:17px;
+  }
+  .info-card .dims{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--brass);
+    margin:0 0 12px;
+  }
+  .info-card dl{margin:0;}
+  .info-card dt{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.8px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+  .info-card dd{
+    margin:2px 0 0;
+    font-size:13px;
+    line-height:1.45;
+  }
+  .swatch-row{display:flex; align-items:center; gap:8px; margin-top:8px;}
+  .swatch{
+    width:20px;height:20px;border-radius:5px;
+    border:1px solid rgba(0,0,0,0.15);
+    flex:none;
+  }
+  .legend{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 14px;
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .legend-item .sw{
+    width:14px;height:14px;border-radius:4px;flex:none;
+    border:1px solid rgba(0,0,0,0.15);
+  }
+  .hint{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:22px;
+    line-height:1.6;
+    border-top:1px dashed var(--line);
+    padding-top:14px;
+  }
+  @media (max-width:920px){
+    .layout{grid-template-columns:1fr;}
+    .side{border-left:none; border-top:1px solid var(--line);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>North Facing Home — Interior Design Concept</h1>
+    <p>Ground floor · 31' × 41' plot · to-scale furnished layout</p>
+  </div>
+  <div class="stats">
+    PLOT AREA <b>1315 sqft</b><br>
+    BUILD-UP AREA <b>769 sqft</b>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="stage">
+    <div class="controls">
+      <div class="seg" id="viewToggle">
+        <button data-view="furnished" class="active">Furnished</button>
+        <button data-view="blueprint">Blueprint</button>
+      </div>
+    </div>
+
+    <div class="plan-frame">
+      <svg id="plan" viewBox="-7 -5 42 56" class="furnished">
+        <!-- ================= OUTER PLOT & SETBACKS ================= -->
+        <rect x="0" y="0" width="31" height="44" fill="#E4DCC8" stroke="var(--line)" stroke-width="0.06"/>
+        <!-- left garden strip -->
+        <rect x="0" y="2" width="4" height="36" fill="#CFE0C4"/>
+        <g class="textile" stroke="#6E9A57" stroke-width="0.06" fill="none">
+          <!-- simple planting dots -->
+        </g>
+        <!-- top setback -->
+        <rect x="4" y="0" width="24.5" height="2" fill="#E4DCC8"/>
+        <!-- right setback -->
+        <rect x="28.5" y="2" width="2.5" height="36" fill="#E4DCC8"/>
+        <!-- front road strip -->
+        <rect x="4" y="38" width="24.5" height="6" fill="#E4DCC8"/>
+
+        <!-- planting marks along left garden -->
+        <g fill="#6E9A57">
+          <circle cx="2" cy="5" r="0.55"/><circle cx="2" cy="9" r="0.55"/><circle cx="2" cy="13" r="0.55"/>
+          <circle cx="2" cy="17" r="0.55"/><circle cx="2" cy="21" r="0.55"/><circle cx="2" cy="25" r="0.55"/>
+          <circle cx="2" cy="29" r="0.55"/><circle cx="2" cy="33" r="0.55"/>
+        </g>
+
+        <!-- ================= ROOMS ================= -->
+        <!-- Kitchen -->
+        <g class="room" data-room="kitchen" data-type="kitchen">
+          <rect class="roomfill" data-fill x="4" y="2" width="8" height="8"/>
+          <text class="room-label" x="8" y="5.6" font-size="0.95">KITCHEN</text>
+          <text class="room-dim" x="8" y="6.7" font-size="0.6">8' x 8'</text>
+          <!-- furniture: L counter, hob, sink, window over counter -->
+          <g class="furniture">
+            <rect x="4.15" y="2.15" width="7.7" height="1.1"/>
+            <rect x="4.15" y="2.15" width="1.1" height="5.6"/>
+            <rect x="7.4" y="2.35" width="1.7" height="0.7"/>
+            <rect x="4.35" y="4.6" width="0.7" height="1.3" rx="0.1"/>
+          </g>
+          <g class="furniture-line">
+            <circle cx="7.75" cy="2.55" r="0.16"/><circle cx="8.35" cy="2.55" r="0.16"/>
+          </g>
+        </g>
+
+        <!-- Attached Toilet -->
+        <g class="room" data-room="toilet" data-type="bath">
+          <rect class="roomfill" data-fill x="12" y="2" width="4" height="4.5"/>
+          <text class="room-label" x="14" y="3.7" font-size="0.55">A.TOILET</text>
+          <text class="room-dim" x="14" y="4.5" font-size="0.48">4' x 4'6"</text>
+          <g class="furniture">
+            <ellipse cx="13" cy="5.7" rx="0.55" ry="0.4"/>
+            <rect x="14.6" y="2.3" width="1.1" height="0.6" rx="0.1"/>
+          </g>
+        </g>
+
+        <!-- Store -->
+        <g class="room" data-room="store" data-type="store">
+          <rect class="roomfill" data-fill x="12" y="6.5" width="4" height="4"/>
+          <text class="room-label" x="14" y="8.3" font-size="0.55">STORE</text>
+          <text class="room-dim" x="14" y="9.05" font-size="0.48">4' x 4'</text>
+          <g class="furniture-line">
+            <line x1="12.3" y1="7.2" x2="15.7" y2="7.2"/>
+            <line x1="12.3" y1="8.1" x2="15.7" y2="8.1"/>
+            <line x1="12.3" y1="9" x2="15.7" y2="9"/>
+          </g>
+        </g>
+
+        <!-- Puja -->
+        <g class="room" data-room="puja" data-type="puja">
+          <rect class="roomfill" data-fill x="12" y="10.5" width="4" height="3"/>
+          <text class="room-label" x="14" y="11.85" font-size="0.5">PUJA</text>
+          <text class="room-dim" x="14" y="12.5" font-size="0.44">4' x 3'</text>
+          <g class="furniture">
+            <polygon points="13.55,12.3 14.45,12.3 14,11.55"/>
+            <rect x="13.5" y="12.3" width="1" height="0.7"/>
+          </g>
+        </g>
+
+        <!-- Master Bedroom -->
+        <g class="room" data-room="bedroom" data-type="bedroom">
+          <rect class="roomfill" data-fill x="16.5" y="2" width="10" height="16.6"/>
+          <text class="room-label" x="21.5" y="9.4" font-size="1">MASTER</text>
+          <text class="room-label" x="21.5" y="10.5" font-size="1">BEDROOM</text>
+          <text class="room-dim" x="21.5" y="11.5" font-size="0.62">10' x 16'6"</text>
+          <g class="furniture">
+            <rect x="19.4" y="3" width="4.2" height="5.4" rx="0.15"/>
+            <rect x="19.7" y="3.15" width="1.7" height="0.9" rx="0.25"/>
+            <rect x="21.8" y="3.15" width="1.7" height="0.9" rx="0.25"/>
+            <rect x="18.6" y="4" width="0.7" height="1.1" rx="0.1"/>
+            <rect x="23.9" y="4" width="0.7" height="1.1" rx="0.1"/>
+          </g>
+          <rect class="textile" x="19.7" y="8.7" width="3.6" height="1.6" fill="#8B5E3C" opacity="0.35"/>
+        </g>
+
+        <!-- Wardrobe -->
+        <g class="room" data-room="wardrobe" data-type="wardrobe">
+          <rect class="roomfill" data-fill x="26.5" y="2" width="2" height="8"/>
+          <text class="room-label" x="27.5" y="6.1" font-size="0.4" transform="rotate(90 27.5 6.1)">WARDROBE</text>
+          <g class="furniture-line">
+            <line x1="26.7" y1="3.5" x2="28.3" y2="3.5"/>
+            <line x1="26.7" y1="5" x2="28.3" y2="5"/>
+            <line x1="26.7" y1="6.5" x2="28.3" y2="6.5"/>
+            <line x1="26.7" y1="8" x2="28.3" y2="8"/>
+          </g>
+        </g>
+
+        <!-- Dining -->
+        <g class="room" data-room="dining" data-type="dining">
+          <rect class="roomfill" data-fill x="4" y="10" width="8" height="8"/>
+          <text class="room-label" x="8" y="13.6" font-size="0.9">DINING</text>
+          <text class="room-dim" x="8" y="14.6" font-size="0.58">8' x 8'</text>
+          <g class="furniture">
+            <rect x="6.7" y="12.7" width="2.6" height="1.8" rx="0.1"/>
+          </g>
+          <g class="furniture-line" fill="#EDE3CE">
+            <circle cx="6.3" cy="13.1" r="0.3"/><circle cx="6.3" cy="14" r="0.3"/>
+            <circle cx="9.7" cy="13.1" r="0.3"/><circle cx="9.7" cy="14" r="0.3"/>
+          </g>
+        </g>
+
+        <!-- Passage -->
+        <g class="room" data-room="passage" data-type="passage">
+          <rect class="roomfill" data-fill x="12" y="13.5" width="6" height="5.1"/>
+          <text class="room-label" x="15" y="16" font-size="0.45" transform="rotate(-90 15 16)">PASSAGE 5'9" x 7'</text>
+        </g>
+
+        <!-- Stairs -->
+        <g class="room" data-room="stairs" data-type="stairs">
+          <rect class="roomfill" data-fill x="18" y="18.6" width="10.5" height="12"/>
+          <text class="room-label" x="23.25" y="19.6" font-size="0.55">STAIRS</text>
+          <g class="furniture-line">
+            <line x1="18.6" y1="19.3" x2="27.9" y2="19.3"/>
+            <line x1="18.6" y1="20.1" x2="27.9" y2="20.1"/>
+            <line x1="18.6" y1="20.9" x2="27.9" y2="20.9"/>
+            <line x1="18.6" y1="21.7" x2="27.9" y2="21.7"/>
+            <line x1="18.6" y1="22.5" x2="27.9" y2="22.5"/>
+            <line x1="18.6" y1="23.3" x2="27.9" y2="23.3"/>
+            <line x1="18.6" y1="24.1" x2="27.9" y2="24.1"/>
+            <line x1="18.6" y1="24.9" x2="27.9" y2="24.9"/>
+            <polygon points="20,25.6 20,26.4 19.3,26" fill="var(--wall)" stroke="none"/>
+          </g>
+        </g>
+
+        <!-- Car Parking -->
+        <g class="room" data-room="parking" data-type="parking">
+          <rect class="roomfill" data-fill x="4" y="18" width="9.5" height="20"/>
+          <text class="room-label" x="8.75" y="27" font-size="0.75">CAR PARKING</text>
+          <text class="room-dim" x="8.75" y="27.9" font-size="0.55">9'6" x 22'</text>
+          <g class="furniture">
+            <rect x="6.5" y="20" width="4.5" height="9" rx="0.9"/>
+          </g>
+          <g class="furniture-line" fill="none">
+            <circle cx="7.2" cy="21.2" r="0.35" fill="var(--wall)"/>
+            <circle cx="10.3" cy="21.2" r="0.35" fill="var(--wall)"/>
+            <circle cx="7.2" cy="27.8" r="0.35" fill="var(--wall)"/>
+            <circle cx="10.3" cy="27.8" r="0.35" fill="var(--wall)"/>
+          </g>
+        </g>
+
+        <!-- Hall -->
+        <g class="room" data-room="hall" data-type="hall">
+          <rect class="roomfill" data-fill x="13.5" y="30.6" width="15" height="9.4"/>
+          <text class="room-label" x="21" y="33.5" font-size="1">HALL</text>
+          <text class="room-dim" x="21" y="34.6" font-size="0.62">17' x 10'</text>
+          <g class="furniture">
+            <rect x="15" y="36.4" width="6" height="1.7" rx="0.2"/>
+            <rect x="15" y="34.9" width="1.7" height="1.4" rx="0.2"/>
+            <rect x="18" y="35.6" width="2" height="1" rx="0.1"/>
+            <rect x="24" y="31.2" width="3" height="0.6"/>
+          </g>
+          <rect class="textile" x="16" y="35.9" width="4" height="2.3" fill="#8B5E3C" opacity="0.25"/>
+        </g>
+
+        <!-- UG Water Tank -->
+        <g class="room" data-room="ugtank" data-type="utility">
+          <rect class="roomfill" data-fill x="4" y="38" width="9.5" height="4"/>
+          <text class="room-label" x="8.75" y="39.7" font-size="0.42">UG WATER</text>
+          <text class="room-label" x="8.75" y="40.4" font-size="0.42">TANK / BORE</text>
+        </g>
+
+        <!-- Septic Tank -->
+        <g class="room" data-room="septic" data-type="utility">
+          <rect class="roomfill" data-fill x="21" y="38.6" width="7.5" height="3.4"/>
+          <text class="room-label" x="24.75" y="40" font-size="0.42">SEPTIC</text>
+          <text class="room-label" x="24.75" y="40.6" font-size="0.42">TANK</text>
+        </g>
+
+        <!-- ================= WALLS (outline over rooms) ================= -->
+        <g class="wall">
+          <rect x="4" y="2" width="24.5" height="36"/>
+          <line x1="12" y1="2" x2="12" y2="18.6"/>
+          <line x1="16.5" y1="2" x2="16.5" y2="18.6"/>
+          <line x1="26.5" y1="2" x2="26.5" y2="10"/>
+          <line x1="4" y1="10" x2="12" y2="10"/>
+          <line x1="12" y1="6.5" x2="16" y2="6.5"/>
+          <line x1="12" y1="10.5" x2="16" y2="10.5"/>
+          <line x1="12" y1="18.6" x2="28.5" y2="18.6"/>
+          <line x1="18" y1="18.6" x2="18" y2="30.6"/>
+          <line x1="4" y1="18" x2="13.5" y2="18"/>
+          <line x1="13.5" y1="18" x2="13.5" y2="40"/>
+          <line x1="13.5" y1="30.6" x2="28.5" y2="30.6"/>
+          <line x1="13.5" y1="38" x2="21" y2="38"/>
+        </g>
+
+        <!-- windows (cyan) -->
+        <g class="window">
+          <line x1="7" y1="2" x2="9" y2="2"/>
+          <line x1="13" y1="2" x2="14.5" y2="2"/>
+          <line x1="22" y1="2" x2="25" y2="2"/>
+          <line x1="4" y1="4.5" x2="4" y2="6.5"/>
+          <line x1="4" y1="13" x2="4" y2="15"/>
+          <line x1="26.5" y1="6" x2="26.5" y2="8"/>
+          <line x1="28.5" y1="23" x2="28.5" y2="25"/>
+          <line x1="28.5" y1="34" x2="28.5" y2="36"/>
+          <line x1="4" y1="24" x2="4" y2="26"/>
+        </g>
+
+        <!-- doors -->
+        <g class="doorleaf">
+          <line x1="12" y1="4.6" x2="13.2" y2="4.6"/>
+          <line x1="12" y1="8.7" x2="13.2" y2="8.7"/>
+          <line x1="14.3" y1="13.5" x2="14.3" y2="14.7"/>
+          <line x1="16.5" y1="9" x2="16.5" y2="10.2"/>
+          <line x1="18.4" y1="38" x2="19.6" y2="38"/>
+        </g>
+
+        <!-- compass -->
+        <g class="compass" transform="translate(16,25)">
+          <circle r="1.4" fill="none" stroke="#B8863B" stroke-width="0.05"/>
+          <line x1="-1.4" y1="0" x2="1.4" y2="0" stroke="#B8863B" stroke-width="0.04"/>
+          <line x1="0" y1="-1.4" x2="0" y2="1.4" stroke="#B8863B" stroke-width="0.04"/>
+          <text x="0" y="-1.6" text-anchor="middle">N</text>
+          <text x="0" y="2.1" text-anchor="middle">S</text>
+          <text x="1.7" y="0.2">W</text>
+          <text x="-2" y="0.2">E</text>
+        </g>
+
+        <!-- ROAD -->
+        <text class="plot-label" x="16" y="47" font-size="1" text-anchor="middle" font-weight="600">ROAD</text>
+        <line x1="-4" y1="46" x2="35" y2="46" stroke="var(--ink-soft)" stroke-width="0.05"/>
+
+        <!-- dimension: top -->
+        <g class="dim-line">
+          <line x1="4" y1="-1.6" x2="28.5" y2="-1.6"/>
+          <line x1="4" y1="-2" x2="4" y2="-1.2"/>
+          <line x1="28.5" y1="-2" x2="28.5" y2="-1.2"/>
+        </g>
+        <text class="dim-text" x="16" y="-2.1" font-size="0.7">31' [9.45M]</text>
+
+        <!-- dimension: left -->
+        <g class="dim-line">
+          <line x1="-1.6" y1="2" x2="-1.6" y2="38"/>
+          <line x1="-2" y1="2" x2="-1.2" y2="2"/>
+          <line x1="-2" y1="38" x2="-1.2" y2="38"/>
+        </g>
+        <text class="dim-text" x="-3.2" y="20" font-size="0.7" transform="rotate(-90 -3.2 20)">41' [12.5M]</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="side">
+    <h2>Interior Palette</h2>
+    <p class="sub">Tap any room to see the design brief</p>
+
+    <div class="style-picker" id="stylePicker">
+      <button data-preset="warm" class="active">Warm Contemporary</button>
+      <button data-preset="coastal">Coastal Minimal</button>
+      <button data-preset="traditional">Traditional Indian</button>
+    </div>
+
+    <div class="info-card" id="infoCard">
+      <h3 id="infoName">Select a room</h3>
+      <p class="dims" id="infoDims">&nbsp;</p>
+      <dl>
+        <dt>Flooring</dt><dd id="infoFloor">Click any room on the plan to view its material and furniture suggestions.</dd>
+        <dt>Wall finish</dt><dd id="infoWall">—</dd>
+        <dt>Furniture &amp; fixtures</dt><dd id="infoFurniture">—</dd>
+        <dt>Lighting tip</dt><dd id="infoTip">—</dd>
+      </dl>
+      <div class="swatch-row"><div class="swatch" id="infoSwatch"></div><span id="infoSwatchLabel" style="font-size:12px;color:var(--ink-soft);"></span></div>
+    </div>
+
+    <h2>Materials Legend</h2>
+    <div class="legend" id="legend"></div>
+
+    <p class="hint">Toggle <b>Blueprint</b> to see the bare structural layout, or <b>Furnished</b> for the styled interior. Switch palettes above to preview three finish directions on the same plan.</p>
+  </div>
+</div>
+
+<script>
+const presets = {
+  warm: {
+    kitchen:"#D9C7A0", bath:"#A9C6C6", store:"#C9BBA0", puja:"#E8DCC0",
+    bedroom:"#E7D8C2", wardrobe:"#C4B79C", dining:"#DCC9A8", passage:"#D9D2C4",
+    stairs:"#C7C0B2", parking:"#B9B6AE", hall:"#EFE6D2", utility:"#CFCFCF"
+  },
+  coastal: {
+    kitchen:"#DCEDEA", bath:"#BFE0DD", store:"#DCE6E0", puja:"#E9F0E8",
+    bedroom:"#E9F0EC", wardrobe:"#D3DEDA", dining:"#E3EEEA", passage:"#E6EEEC",
+    stairs:"#DCE6E2", parking:"#C9D2CE", hall:"#F1F5F1", utility:"#D6DCDA"
+  },
+  traditional: {
+    kitchen:"#E8B36B", bath:"#9FC2C9", store:"#D6B27F", puja:"#EFCB8C",
+    bedroom:"#D9A05B", wardrobe:"#CBA46E", dining:"#E3B571", passage:"#D8B784",
+    stairs:"#CBA46E", parking:"#B79A73", hall:"#E7C48A", utility:"#C9C0AE"
+  }
+};
+
+const roomInfo = {
+  kitchen:{name:"Kitchen", dims:"8' × 8'", floor:"Vitrified anti-skid tile", wall:"Warm putty finish with oil-proof glass backsplash", furniture:"L-shaped counter, 2-burner hob, single-bowl sink, overhead cabinetry", tip:"Layer a warm under-cabinet LED strip with a bright ceiling light for the work zone."},
+  toilet:{name:"Attached Toilet", dims:"4' × 4'6\"", floor:"Matte ceramic tile, textured for grip", wall:"Aqua-tinted tile dado to 4', waterproof paint above", furniture:"Wall-hung WC, corner wash basin, exhaust fan", tip:"A frosted window plus a moisture-rated bulb keeps it bright without glare."},
+  store:{name:"Store Room", dims:"4' × 4'", floor:"Plain ceramic tile", wall:"Durable enamel paint", furniture:"Three fixed utility shelves floor to ceiling", tip:"A single warm bulb on a pull-cord is enough — keep it functional."},
+  puja:{name:"Puja Room", dims:"4' × 3'", floor:"Marble or light stone inlay", wall:"Soft ivory with a wooden mandir backdrop", furniture:"Compact wall-mounted mandir with a small shelf below", tip:"Face east/north-east if possible; add a warm brass hanging lamp."},
+  bedroom:{name:"Master Bedroom", dims:"10' × 16'6\"", floor:"Engineered wood laminate", wall:"Soft clay accent behind the headboard, warm white elsewhere", furniture:"King bed with upholstered headboard, two nightstands, area rug, reading chair", tip:"Add dimmable warm-white downlights plus bedside sconces for two lighting moods."},
+  wardrobe:{name:"Wardrobe Nook", dims:"2' deep run", floor:"Matches bedroom flooring", wall:"Same as bedroom", furniture:"Floor-to-ceiling sliding wardrobe with internal shelving", tip:"Internal LED strip lighting makes a narrow wardrobe feel far more usable."},
+  dining:{name:"Dining", dims:"8' × 8'", floor:"Matches kitchen tile for an easy-clean zone", wall:"Warm neutral, open to the hall", furniture:"4-seat dining table with a pendant light above", tip:"Hang the pendant 30\" above the table for even, glare-free light."},
+  passage:{name:"Passage", dims:"5'9\" × 7'", floor:"Continuous tile matching the hall", wall:"Neutral, kept simple as a transition zone", furniture:"Slim console or bench, wall art", tip:"A row of small ceiling spots keeps a windowless corridor from feeling dark."},
+  stairs:{name:"Staircase", dims:"to upper floor", floor:"Anti-skid stone treads", wall:"Feature paint or exposed brick along the stair wall", furniture:"Handrail in wood or MS with a matte black finish", tip:"Light every third or fourth riser to avoid deep shadow bands underfoot."},
+  parking:{name:"Car Parking", dims:"9'6\" × 22'", floor:"Broom-finish or exposed-aggregate concrete", wall:"Open to the driveway, low garden wall", furniture:"Wall-mounted shelf for tools, weatherproof light", tip:"One bright fixture at the entry point covers both safety and utility."},
+  hall:{name:"Living Hall", dims:"17' × 10'", floor:"Large-format marble or vitrified tile", wall:"Warm neutral with one textured feature wall behind the TV", furniture:"3-seat sofa, coffee table, TV console, area rug", tip:"Combine a ceiling fan-light, a floor lamp and cove lighting for evening ambience."},
+  ugtank:{name:"UG Water Tank / Bore", dims:"9'6\" × 4'", floor:"Concrete slab cover", wall:"—", furniture:"Sealed manhole cover, bore casing", tip:"Keep it accessible but screened with low planting."},
+  septic:{name:"Septic Tank", dims:"7'6\" × 3'4\"", floor:"Concrete slab cover", wall:"—", furniture:"Vented manhole cover", tip:"Locate any vent pipe away from windows and the main door."}
+};
+
+const typeLabels = {
+  kitchen:"Kitchen", bath:"Bath / Toilet", store:"Store", puja:"Puja",
+  bedroom:"Bedroom", wardrobe:"Wardrobe", dining:"Dining", passage:"Passage",
+  stairs:"Stairs", parking:"Parking", hall:"Hall", utility:"Utility (Tanks)"
+};
+
+const svg = document.getElementById('plan');
+
+function applyPreset(name){
+  const p = presets[name];
+  document.querySelectorAll('[data-fill]').forEach(el=>{
+    const type = el.parentElement.getAttribute('data-type');
+    if(p[type]) el.setAttribute('fill', p[type]);
+  });
+  buildLegend(p);
+}
+
+function buildLegend(p){
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  Object.keys(typeLabels).forEach(type=>{
+    const color = p[type] || '#CFCFCF';
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<span class="sw" style="background:${color}"></span>${typeLabels[type]}`;
+    legend.appendChild(item);
+  });
+}
+
+document.getElementById('stylePicker').addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  document.querySelectorAll('#stylePicker button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyPreset(btn.dataset.preset);
+});
+
+document.getElementById('viewToggle').addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  svg.classList.toggle('blueprint', btn.dataset.view === 'blueprint');
+});
+
+svg.querySelectorAll('.room').forEach(room=>{
+  room.addEventListener('click', ()=>{
+    svg.querySelectorAll('.room').forEach(r=>r.classList.remove('selected'));
+    room.classList.add('selected');
+    const key = room.getAttribute('data-room');
+    const type = room.getAttribute('data-type');
+    const info = roomInfo[key];
+    const activePreset = document.querySelector('#stylePicker button.active').dataset.preset;
+    const color = presets[activePreset][type] || '#CFCFCF';
+    document.getElementById('infoName').textContent = info.name;
+    document.getElementById('infoDims').textContent = info.dims;
+    document.getElementById('infoFloor').textContent = info.floor;
+    document.getElementById('infoWall').textContent = info.wall;
+    document.getElementById('infoFurniture').textContent = info.furniture;
+    document.getElementById('infoTip').textContent = info.tip;
+    document.getElementById('infoSwatch').style.background = color;
+    document.getElementById('infoSwatchLabel').textContent = typeLabels[type] + ' finish';
+  });
+});
+
+applyPreset('warm');
+</script>
+</body>
+</html>
